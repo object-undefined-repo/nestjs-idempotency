@@ -10,6 +10,9 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@api/*": ["src/api/*"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
