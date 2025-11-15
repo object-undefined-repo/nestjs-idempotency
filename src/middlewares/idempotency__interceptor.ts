@@ -12,7 +12,7 @@ import { IdempotencyInmemoryRepository } from '../repositories/index';
 import { IdempotencyRepository } from '@api/index';
 
 @Injectable()
-export class IdempotencyKeyInterceptor implements NestInterceptor {
+export class IdempotencyInterceptor implements NestInterceptor {
   constructor(
     @Inject(IdempotencyInmemoryRepository)
     private readonly idempotencyRepository: IdempotencyRepository,
@@ -24,33 +24,33 @@ export class IdempotencyKeyInterceptor implements NestInterceptor {
   ): Promise<Observable<any>> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
-    const idempotencyKey:string = request.headers['x-idempotency-key'];
+    const idempotencyId:string = request.headers['x-idempotency-id'];
 
-    if (!idempotencyKey) {
+    if (!idempotencyId) {
       throw new BadRequestException(
-        "Header 'x-idempotency-key' is required for this request.",
+        "Header 'x-idempotency-id' is required for this request.",
       );
     }
 
-    if (!this.isValidUUID(idempotencyKey)) {
+    if (!this.isValidUUID(idempotencyId)) {
       throw new BadRequestException(
-        "Header 'x-idempotency-key' must be a UUID.",
+        "Header 'x-idempotency-id' must be a UUID.",
       );
     }
 
     const idempotencyModel = await this.idempotencyRepository.find(
-      idempotencyKey,
+      idempotencyId,
     );
 
     if (idempotencyModel) {
       return of(idempotencyModel.response);
     }
 
-    await this.idempotencyRepository.preSave(idempotencyKey);
+    await this.idempotencyRepository.preSave(idempotencyId);
 
     return next.handle().pipe(
       tap(async (data) => {
-        await this.idempotencyRepository.update(idempotencyKey, data);
+        await this.idempotencyRepository.update(idempotencyId, data);
         return data;
       }),
     );
