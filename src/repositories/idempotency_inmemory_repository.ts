@@ -10,10 +10,7 @@ export class IdempotencyInmemoryRepository implements IdempotencyRepository{
         this.data[idempotencyId] = response;
     }
 
-    public async  find(idempotencyId: string): Promise<{ response: string } | null>{
-        if(this.data[idempotencyId])
-            return { response: "ok" };
-        else
-            return null;
+    public async  find(idempotencyId: string): Promise<{ response: any } | null>{
+            return this.data?.[idempotencyId];
     }    
 }

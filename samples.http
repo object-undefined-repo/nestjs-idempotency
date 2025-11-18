@@ -1,0 +1,9 @@
+POST http://localhost:3000/idempotent
+x-idempotency-id: b81e01b5-bafd-403d-8b80-d9968a0eb451
+
+{"test":"test"}
+
+### FAILED IDEMPOTENT REQUEST
+POST http://localhost:3000/not-idempotent
+
+{}

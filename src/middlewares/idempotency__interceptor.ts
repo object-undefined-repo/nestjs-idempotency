@@ -38,12 +38,12 @@ export class IdempotencyInterceptor implements NestInterceptor {
       );
     }
 
-    const idempotencyModel = await this.idempotencyRepository.find(
+    const idempotentResponse = await this.idempotencyRepository.find(
       idempotencyId,
     );
 
-    if (idempotencyModel) {
-      return of(idempotencyModel.response);
+    if (idempotentResponse) {
+      return of(idempotentResponse);
     }
 
     await this.idempotencyRepository.preSave(idempotencyId);
