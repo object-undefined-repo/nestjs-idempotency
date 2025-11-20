@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UseInterceptors } from '@nestjs/common';
-import { IdempotencyInterceptor } from '../middlewares/idempotency__interceptor';
+import { IdempotencyInterceptor } from '../interceptors/idempotency__interceptor';
 
 @Controller('idempotent')
 @UseInterceptors(IdempotencyInterceptor)

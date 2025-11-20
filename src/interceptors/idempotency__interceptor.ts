@@ -43,14 +43,18 @@ export class IdempotencyInterceptor implements NestInterceptor {
     );
 
     if (idempotentResponse) {
-      return of(idempotentResponse);
+      return of({... idempotentResponse,
+        desctiption:'This is stored response of idempotent operation'
+      });
     }
 
     await this.idempotencyRepository.preSave(idempotencyId);
 
     return next.handle().pipe(
       tap(async (data) => {
-        await this.idempotencyRepository.update(idempotencyId, data);
+        await this.idempotencyRepository.update(idempotencyId, {... data,
+          idempotencyId
+        });
         return data;
       }),
     );
