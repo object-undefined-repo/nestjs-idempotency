@@ -1,11 +1,11 @@
 
 import { Module } from '@nestjs/common';
 import { IdempotentController, NotIdempotentController } from './api';
-import { IdempotencyInmemoryRepository } from './repositories';
+import { IdempotencyInMemoryRepository } from './repositories';
 
 @Module({
   imports: [],
   controllers: [IdempotentController, NotIdempotentController],
-  providers: [IdempotencyInmemoryRepository],
+  providers: [IdempotencyInMemoryRepository],
 })
 export class AppModule {}

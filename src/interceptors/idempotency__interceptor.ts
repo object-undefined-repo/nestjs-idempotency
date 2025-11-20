@@ -8,13 +8,13 @@ import {
 } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { IdempotencyInmemoryRepository } from '../repositories/index';
+import { IdempotencyInMemoryRepository } from '../repositories/index';
 import { IdempotencyRepository } from '@api/index';
 
 @Injectable()
 export class IdempotencyInterceptor implements NestInterceptor {
   constructor(
-    @Inject(IdempotencyInmemoryRepository)
+    @Inject(IdempotencyInMemoryRepository)
     private readonly idempotencyRepository: IdempotencyRepository,
   ) {}
 

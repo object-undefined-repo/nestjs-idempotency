@@ -1,7 +1,7 @@
 import { IdempotencyRepository} from "@api/index";
 import { Injectable } from "@nestjs/common";
 @Injectable()
-export class IdempotencyInmemoryRepository implements IdempotencyRepository{
+export class IdempotencyInMemoryRepository implements IdempotencyRepository{
     private data:Record<string,any> = {};
     public async preSave(idempotencyId: string): Promise<void> {
        this.data[idempotencyId] = {};
