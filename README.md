@@ -1,78 +1,34 @@
-# Multiple GitHub Accounts Setup Guide
+# NestJS Idempotency Example
 
-This guide explains how to set up a repository to work with a different GitHub account than your global Git configuration.
+This project demonstrates the concept of idempotency in API design using NestJS. It includes two controllers: `idempotent` and `not_idempotent`, each illustrating different behaviors regarding repeated requests.
 
-## 1. Configure Local Git User
-Set the local Git configuration for this repository (different from global):
-```powershell
-git config --local user.name "your-second-github-username"
-git config --local user.email "your-second-email@example.com"
-```
+## What is Idempotency?
 
-## 2. Create SSH Key for Second Account
-Generate a new SSH key specifically for the second GitHub account:
-```powershell
-ssh-keygen -t ed25519 -C "your-second-email@example.com" -f ~/.ssh/id_ed25519_object_undefined
-```
+**Idempotency** is a property of certain operations in which performing the same operation multiple times produces the same result as performing it once. In the context of APIs, an idempotent endpoint ensures that making the same request multiple times will not have additional side effects after the initial request.
 
-## 3. Set Up SSH Config
-Create or edit `~/.ssh/config` file with multiple GitHub profiles:
-```
-# Default GitHub account
-Host github.com
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/id_rsa
+For example, creating a resource with the same unique identifier multiple times should not create duplicate resources if the endpoint is idempotent.
 
-# Second GitHub account
-Host github-object-undefined
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/id_ed25519_object_undefined
-```
+## How Idempotency Works in the Interceptor
 
-## 4. Add SSH Key to GitHub
-1. Copy the public key content:
-```powershell
-Get-Content ~/.ssh/id_ed25519_object_undefined.pub
-```
-2. Add this key to your second GitHub account:
-   - Go to GitHub.com (logged in as second account)
-   - Navigate to Settings > SSH and GPG keys
-   - Click "New SSH key"
-   - Paste the public key content
+The `idempotency_interceptor` checks for an idempotency key in incoming requests. If a request with the same key was already processed, it returns the stored response instead of executing the handler again. This prevents duplicate processing and ensures safe retries.
 
-## 5. Update Repository Remote URL
-Change the repository's remote URL to use the second account's SSH configuration:
-```powershell
-git remote set-url origin git@github-object-undefined:object-undefined-repo/nestjs-idempotency.git
-```
+## Controllers
 
-## 6. Verify Configuration
-Check that everything is set up correctly:
-```powershell
-# Verify local Git config
-git config --local --list | Select-String "user.name|user.email"
+### Idempotent Controller (`idempotent.controller.ts`)
+- **Purpose:** Demonstrates an endpoint that is idempotent.
+- **Behavior:** Multiple identical requests (with the same idempotency key or unique identifier) will have the same effect as a single request. No duplicate processing or resource creation occurs.
+- **Use Case:** Useful for operations like payment processing, resource creation, or any action where duplicate processing must be avoided.
 
-# Verify remote URL
-git remote -v
-```
+### Not Idempotent Controller (`not_idempotent.controller.ts`)
+- **Purpose:** Demonstrates an endpoint that is not idempotent.
+- **Behavior:** Each request, even if identical, is processed independently. Repeated requests may result in duplicate actions or resource creation.
+- **Use Case:** Useful for operations where each request should be treated as a new action, such as logging events or appending to a list.
 
-## Testing
-Try pushing to verify the setup:
-```powershell
-git push -u origin main
-```
+## Usage
 
-## Notes
-- This configuration only affects this repository
-- Other repositories will continue using the global Git configuration
-- The SSH config allows both GitHub accounts to coexist
-- Each push from this repository will use the second account's credentials
+- Use the `idempotent` endpoint to ensure safe retries and avoid duplicate processing.
+- Use the `not_idempotent` endpoint to see the effects of non-idempotent operations.
 
-## Troubleshooting
-If you get a "permission denied" error:
-1. Ensure the SSH key is added to the correct GitHub account
-2. Check the SSH config file syntax
-3. Verify the remote URL uses the correct Host from SSH config
-4. Test SSH connection: `ssh -T git@github-object-undefined`
+---
+
+For more details, see the source code in the `src/api` directory.
