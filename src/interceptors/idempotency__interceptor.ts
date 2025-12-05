@@ -24,22 +24,22 @@ export class IdempotencyInterceptor implements NestInterceptor {
   ): Promise<Observable<any>> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
-    const idempotencyId:string = request.headers['x-idempotency-id'];
+    const idempotencyKey:string = request.headers['x-idempotency-id'];
 
-    if (!idempotencyId) {
+    if (!idempotencyKey) {
       throw new BadRequestException(
         "Header 'x-idempotency-id' is required for this request.",
       );
     }
 
-    if (!this.isValidUUID(idempotencyId)) {
+    if (!this.isValidUUID(idempotencyKey)) {
       throw new BadRequestException(
         "Header 'x-idempotency-id' must be a UUID.",
       );
     }
 
     const idempotentResponse = await this.idempotencyRepository.find(
-      idempotencyId,
+      idempotencyKey,
     );
 
     if (idempotentResponse) {
@@ -48,12 +48,12 @@ export class IdempotencyInterceptor implements NestInterceptor {
       });
     }
 
-    await this.idempotencyRepository.preSave(idempotencyId);
+    await this.idempotencyRepository.preSave(idempotencyKey);
 
     return next.handle().pipe(
       tap(async (data) => {
-        await this.idempotencyRepository.update(idempotencyId, {... data,
-          idempotencyId
+        await this.idempotencyRepository.update(idempotencyKey, {... data,
+          idempotencyKey
         });
         return data;
       }),
