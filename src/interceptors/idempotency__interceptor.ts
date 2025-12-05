@@ -28,13 +28,13 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
     if (!idempotencyKey) {
       throw new BadRequestException(
-        "Header 'x-idempotency-id' is required for this request.",
+        "Header 'x-idempotency-key' is required for this request.",
       );
     }
 
     if (!this.isValidUUID(idempotencyKey)) {
       throw new BadRequestException(
-        "Header 'x-idempotency-id' must be a UUID.",
+        "Header 'x-idempotency-key' must be a UUID.",
       );
     }
 
